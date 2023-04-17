@@ -110,6 +110,40 @@ const Sign = () => {
     }, 3000);
   };
 
+  const handleSubmitSignupWithGoogle = async (e) => {
+    e.preventDefault();
+    auth.login(formData_signup.email);
+
+    setPage(2);
+    const v1 = Email_REGEX.test(formData_signup.email);
+
+    if (!v1) {
+      setErrMsg("invalid Entry");
+      return;
+    }
+    try {
+      const response = await axios.post(
+        REGISTER_URL,
+        JSON.stringify({
+          email: formData_signup.email,
+        }),
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      console.log(response?.data);
+      console.log(response?.accessToken);
+      console.log(JSON.stringify(response));
+    } catch (err) {
+      console.log(err);
+    }
+    setPage(2);
+    setTimeout(() => {
+      navigate(redirectPath, { replace: true });
+    }, 3000);
+  };
+
   //submit signin
   const handleSubmitSignin = async (e) => {
     e.preventDefault();
@@ -120,7 +154,7 @@ const Sign = () => {
         logIn_URL,
         JSON.stringify({
           email: formData_signin.email,
-          password: formData_signin.password,
+          password: formData_signin.password ? formData_signin.password : null,
         }),
         {
           headers: { "Content-Type": "application/json" },
@@ -300,7 +334,10 @@ const Sign = () => {
   //signup with google
   let content_Two = (
     <>
-      <form className="flex flex-col justify-center items-center w-full  h-full p-6 ">
+      <form
+        className="flex flex-col justify-center items-center w-full  h-full p-6"
+        onSubmit={handleSubmitSignupWithGoogle}
+      >
         <h2 className="text-[1.5rem] sm:text-[2.5rem] font-bold">Sign Up</h2>
 
         <label
@@ -335,7 +372,6 @@ const Sign = () => {
 
         <button
           className="bg-blue-500 text-white px-3 py-1  sm:px-5 sm:py-1 rounded-lg text-[1.1rem] mt-5 disabled:bg-slate-400"
-          onClick={() => setPage(2)}
           disabled={!validEmail}
         >
           Sign Up
